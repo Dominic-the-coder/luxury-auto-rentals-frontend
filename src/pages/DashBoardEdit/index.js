@@ -25,8 +25,6 @@ export default function EditCar() {
   const navigate = useNavigate();
   const [cookies] = useCookies(["currentUser"]);
   const token = getUserToken(cookies);
-
-  //states
   const [role, setRole] = useState("");
 
   // check if is admin or not
@@ -37,18 +35,19 @@ export default function EditCar() {
   }, [cookies, navigate]);
 
   useEffect(() => {
-    getUser(id).then((data) => {
-      setRole(data.role);
-      console.log(data);
-    });
+    getUser(id)
+      .then((data) => {
+        console.log("Fetched user data:", data); // Check API response
+        if (data && data.role) {
+          setRole(data.role);
+        } else {
+          console.error("Role not found in response:", data);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching user:", error);
+      });
   }, [id]);
-
-  useEffect(() => {
-    getUsers().then((data) => {
-      console.log(data);
-      setUser(data);
-    });
-  }, []);
 
   //update category handler
   const handleUpdate = async (event) => {
@@ -87,18 +86,15 @@ export default function EditCar() {
             <Box mb={2}>
               <FormControl fullWidth>
                 <InputLabel>Role</InputLabel>
-                <Select
-                  value={role}
-                  onChange={(event) => setRole(event.target.value)}
-                >
-                  {user.role !== "admin" ? (
-                    <>
+                {role ? (
+                  <Select
+                    value={role}
+                    onChange={(event) => setRole(event.target.value)}
+                  >
                     <MenuItem value="user">User</MenuItem>
-                    </>
-                  ):null};
-                  
-                  <MenuItem value="admin">Admin</MenuItem>
-                </Select>
+                    <MenuItem value="admin">Admin</MenuItem>
+                  </Select>
+                ) : null}
               </FormControl>
             </Box>
             <Button

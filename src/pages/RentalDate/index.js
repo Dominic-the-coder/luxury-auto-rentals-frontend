@@ -61,12 +61,13 @@ export default function RentalDate() {
   }));
 
   // Function to disable booked dates
+  // Function to disable booked dates
   const shouldDisableDate = (date) => {
-    return disabledRanges.some(
-      (range) =>
-        date.isAfter(range.start.subtract(1, "day")) &&
-        date.isBefore(range.end.add(1, "day"))
-    );
+    return rents.some((rent) => {
+      const start = dayjs(rent.start_date);
+      const end = dayjs(rent.end_date);
+      return date.isBetween(start, end, "day", "[]"); // Includes start & end date
+    });
   };
 
   const handleRentDateChange = (newValue) => {
@@ -116,8 +117,8 @@ export default function RentalDate() {
                   label="Rent Date"
                   value={rentDate}
                   onChange={handleRentDateChange}
-                  minDate={dayjs()}
-                  shouldDisableDate={shouldDisableDate}
+                  minDate={dayjs()} // Prevents selecting past dates
+                  shouldDisableDate={shouldDisableDate} // Disables booked dates
                 />
               </LocalizationProvider>
 
@@ -126,8 +127,8 @@ export default function RentalDate() {
                   label="Return Date"
                   value={returnDate}
                   onChange={handleReturnDateChange}
-                  minDate={rentDate.add(1, "day")}
-                  shouldDisableDate={shouldDisableDate}
+                  minDate={rentDate.add(1, "day")} // Ensures return date is after rent date
+                  shouldDisableDate={shouldDisableDate} // Disables booked dates
                 />
               </LocalizationProvider>
             </Box>
